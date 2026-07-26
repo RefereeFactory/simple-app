@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simple App — Guest List</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #fdf8f3;
+    --card: #ffffff;
+    --ink: #2d2a26;
+    --muted: #8a8178;
+    --accent: #e08a4c;
+    --accent-dark: #c46f34;
+    --line: #eee3d7;
+    --shadow: 0 8px 30px rgba(120, 90, 60, 0.10);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.6;
+    min-height: 100vh;
+    padding: 24px 18px 60px;
+    display: flex;
+    justify-content: center;
+  }
+  .wrap { width: 100%; max-width: 560px; }
+
+  header.hero {
+    text-align: center;
+    padding: 28px 18px 34px;
+  }
+  .badge {
+    display: inline-block;
+    font-size: 0.78rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent-dark);
+    background: #fbeadd;
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-weight: 600;
+    margin-bottom: 18px;
+  }
+  h1 {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 2.2rem;
+    line-height: 1.15;
+    margin-bottom: 12px;
+  }
+  header.hero p {
+    color: var(--muted);
+    font-size: 1.02rem;
+    max-width: 42ch;
+    margin: 0 auto;
+  }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    box-shadow: var(--shadow);
+    padding: 22px;
+    margin-top: 8px;
+  }
+
+  form { display: flex; flex-direction: column; gap: 12px; }
+  label {
+    font-weight: 600;
+    font-size: 0.95rem;
+  }
+  .row { display: flex; gap: 10px; flex-wrap: wrap; }
+  input[type="text"] {
+    flex: 1 1 180px;
+    min-height: 48px;
+    padding: 12px 16px;
+    font-size: 1rem;
+    font-family: inherit;
+    border: 1.5px solid var(--line);
+    border-radius: 12px;
+    background: #fff;
+    color: var(--ink);
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  input[type="text"]:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(224, 138, 76, 0.18);
+  }
+  button.add {
+    min-height: 48px;
+    padding: 12px 24px;
+    font-size: 1rem;
+    font-weight: 600;
+    font-family: inherit;
+    color: #fff;
+    background: var(--accent);
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+  }
+  button.add:hover { background: var(--accent-dark); }
+  button.add:active { transform: translateY(1px); }
+  button.add:disabled { opacity: 0.6; cursor: default; }
+
+  .status {
+    font-size: 0.85rem;
+    color: var(--muted);
+    min-height: 20px;
+    text-align: center;
+    margin-top: 4px;
+    transition: opacity 0.3s;
+  }
+  .status.show { color: var(--accent-dark); }
+
+  .list-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin: 30px 4px 12px;
+  }
+  .list-head h2 {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 1.3rem;
+  }
+  .count {
+    font-size: 0.9rem;
+    color: var(--muted);
+    background: #fff;
+    border: 1px solid var(--line);
+    padding: 3px 12px;
+    border-radius: 999px;
+    font-weight: 600;
+  }
+
+  ul.guests { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+  ul.guests li {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    animation: pop 0.35s ease;
+  }
+  @keyframes pop {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .avatar {
+    flex: 0 0 auto;
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    background: #fbeadd;
+    color: var(--accent-dark);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 600;
+    font-size: 1rem;
+  }
+  .name { flex: 1; font-weight: 500; word-break: break-word; }
+  .empty {
+    text-align: center;
+    color: var(--muted);
+    padding: 30px 10px;
+    font-style: italic;
+  }
+
+  footer.how {
+    margin-top: 44px;
+    padding: 22px;
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 18px;
+  }
+  footer.how h3 {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 1.1rem;
+    margin-bottom: 10px;
+  }
+  footer.how p { color: var(--muted); font-size: 0.92rem; }
+  footer.how ul { margin: 8px 0 0 18px; color: var(--muted); font-size: 0.92rem; }
+
+  @media (min-width: 600px) {
+    h1 { font-size: 2.6rem; }
+    body { padding-top: 48px; }
+  }
+</style>
+<script id="factory-store-sdk">
+window.factory=(function(){
+var K="c332ebd8-56ef-4ba9-8d27-a3974bc325fb",U="https://canvbkibjgcnqowjtarf.supabase.co/functions/v1/app-market",A="sb_publishable_sMTQKIeFgT1vwjHnU7Gexg_8CCmhtxs";
+function call(b){b.appKey=K;return fetch(U,{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+A},body:JSON.stringify(b)}).then(function(r){return r.json().then(function(d){if(!r.ok)throw new Error(d.error||("store "+r.status));return d;});});}
+var S={
+put:function(c,i,d){return call({op:"put",collection:c,id:String(i),data:d}).then(function(x){return x.doc?x.doc.data:null;});},
+get:function(c,i){return call({op:"get",collection:c,id:String(i)}).then(function(x){return x.doc?x.doc.data:null;});},
+list:function(c){return call({op:"list",collection:c}).then(function(x){return x.docs.map(function(d){return d.data;});});},
+remove:function(c,i){return call({op:"delete",collection:c,id:String(i)}).then(function(){return true;});},
+unlock:function(code){return call({op:"redeem",code:String(code)}).then(function(x){try{localStorage.setItem("factory_access",x.status);}catch(e){}return x.status;});},
+access:function(){try{return localStorage.getItem("factory_access")||"none";}catch(e){return "none";}}
+};
+var _c=null;try{var h=(location.hash||"").match(/factory_code=([a-z0-9-]+)/i);_c=h?h[1]:localStorage.getItem("factory_code");if(h){history.replaceState(null,"",location.pathname+location.search);}}catch(e){}
+var F={put:S.put,get:S.get,list:S.list,remove:S.remove,unlock:S.unlock,access:S.access};
+F.ready=_c?S.unlock(_c).then(function(s){try{if(s!=="invalid")localStorage.setItem("factory_code",_c);}catch(e){}return s;}).catch(function(){return S.access();}):Promise.resolve(S.access());
+return F;})();
+</script>
+</head>
+<body>
+  <div class="wrap">
+    <header class="hero">
+      <span class="badge">Guest List</span>
+      <h1>Keep Names In Here</h1>
+      <p>Welcome! This is a shared, permanent guest list. Add your name below and it will stay here for everyone to see — no login, no fuss.</p>
+    </header>
+
+    <section class="card">
+      <form id="guestForm">
+        <label for="nameInput">Add your name</label>
+        <div class="row">
+          <input type="text" id="nameInput" name="name" placeholder="Type your name…" autocomplete="name" maxlength="60" required>
+          <button type="submit" class="add" id="addBtn">Add to list</button>
+        </div>
+      </form>
+      <div class="status" id="status" role="status" aria-live="polite"></div>
+    </section>
+
+    <div class="list-head">
+      <h2>Our Guests</h2>
+      <span class="count" id="count" aria-label="Number of guests">0</span>
+    </div>
+    <ul class="guests" id="guestList" aria-live="polite"></ul>
+
+    <footer class="how">
+      <h3>How it works</h3>
+      <p>Type your name and tap <strong>Add to list</strong>. Your name is saved to a shared cloud list, so it stays here permanently and everyone who visits this page sees the same list. No account or login is needed. The most recent additions appear at the top.</p>
+      <ul>
+        <li>Names are shared publicly with all visitors.</li>
+        <li>Everything is stored automatically — nothing to save manually.</li>
+      </ul>
+    </footer>
+  </div>
+
+<script>
+  const form = document.getElementById('guestForm');
+  const input = document.getElementById('nameInput');
+  const btn = document.getElementById('addBtn');
+  const listEl = document.getElementById('guestList');
+  const countEl = document.getElementById('count');
+  const statusEl = document.getElementById('status');
+
+  let guests = [];
+
+  function initials(name) {
+    const parts = name.trim().split(/\s+/);
+    let s = parts[0][0] || '';
+    if (parts.length > 1) s += parts[parts.length - 1][0];
+    return s.toUpperCase();
+  }
+
+  function escapeHtml(str) {
+    return str.replace(/[&<>"']/g, c => ({
+      '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+    }[c]));
+  }
+
+  function render() {
+    countEl.textContent = guests.length;
+    if (guests.length === 0) {
+      listEl.innerHTML = '<li class="empty" style="justify-content:center;">No names yet — be the first to add yours!</li>';
+      return;
+    }
+    listEl.innerHTML = guests.map(g => `
+      <li>
+        <span class="avatar" aria-hidden="true">${escapeHtml(initials(g.name))}</span>
+        <span class="name">${escapeHtml(g.name)}</span>
+      </li>
+    `).join('');
+  }
+
+  function setStatus(msg, active) {
+    statusEl.textContent = msg;
+    statusEl.classList.toggle('show', !!active);
+  }
+
+  async function load() {
+    setStatus('Loading guest list…');
+    try {
+      const docs = await factory.list('guests');
+      guests = docs || [];
+    } catch (e) {
+      guests = [];
+    }
+    render();
+    setStatus('');
+  }
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const name = input.value.trim();
+    if (!name) { setStatus('Please type a name first.', true); return; }
+
+    btn.disabled = true;
+    setStatus('Saving…');
+
+    const id = String(Date.now());
+    const doc = { name: name, when: new Date().toISOString() };
+
+    try {
+      await factory.put('guests', id, doc);
+      guests.unshift(doc);
+      render();
+      input.value = '';
+      setStatus('Saved — thanks for signing in!', true);
+    } catch (err) {
+      setStatus('Sorry, could not save. Please try again.', true);
+    } finally {
+      btn.disabled = false;
+      input.focus();
+    }
+  });
+
+  load();
+</script>
+<div id="factory-provenance" style="padding:14px 16px;text-align:center;font:11px/1.7 system-ui,sans-serif;color:#888;opacity:.85;">&#9874; Built with <a href="https://factory-the-factory-ui.netlify.app" style="color:#888;">The Factory</a> using third-party AI tools &#183; the app owner is responsible for its content &#183; Standard: UK law, aligned with the UN Universal Declaration of Human Rights &#183; <a href="https://factory-the-factory-ui.netlify.app/terms.html" style="color:#888;">Terms</a></div>
+</body>
+</html>
